@@ -1,0 +1,7 @@
+apiVersion: v2
+name: note-app
+description: A Helm chart for deploying the note-app containerized application
+# A chart version should be incremented each time you make changes
+type: application
+version: 0.1.0
+appVersion: "latest"  # set to the version of your application
