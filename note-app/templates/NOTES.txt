@@ -3,3 +3,7 @@
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "note-app.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl port-forward $POD_NAME 8080:80
+
+{{- if .Values.hpa.enabled }}
+2. Horizontal Pod Autoscaler is enabled. The deployment will scale between {{ .Values.hpa.minReplicas }} and {{ .Values.hpa.maxReplicas }} replicas based on CPU utilization.
+{{- end }}
