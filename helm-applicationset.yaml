@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: helm-apps-git
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/hemanthreddy739/my-apps-argo-type.git
+      revision: main
+      directories:
+      - path: '*'                # create one app per top-level folder
+  template:
+    metadata:
+      name: '{{path.basename}}' # app name = folder name
+      namespace: argocd
+      annotations:
+        # argocd-image-updater configuration for each generated Application
+        # image-list is parameterized per-folder (image repo == folder name)
+        argocd-image-updater.argoproj.io/image-list: "hemanthreddy739.azurecr.io/{{path.basename}}"
+        # Use git write-back so image-updater writes the immutable tag (SHA) into the Helm chart
+        argocd-image-updater.argoproj.io/write-back-method: git
+        argocd-image-updater.argoproj.io/git-repo: https://github.com/hemanthreddy739/my-apps-argo-type.git
+        argocd-image-updater.argoproj.io/git-branch: main
+        # Kubernetes secret (in `argocd` ns) that contains git credentials (username/token)
+        argocd-image-updater.argoproj.io/git-token-secret: image-updater-git-credentials
+        # Pull secret name in `argocd` ns so image-updater can query ACR tags
+        argocd-image-updater.argoproj.io/pull-secret: acr-credentials
+        # Instruct (by annotation) that we prefer immutable tags (git SHA). The
+        # image-updater instance should be configured to respect this by allowing
+        # SHA-like tags; allow-tags below is a helpful hint and common pattern.
+        argocd-image-updater.argoproj.io/allow-tags: "^[0-9a-f]{7,}$"
+        # We do NOT use the literal 'latest' strategy here. Instead we enforce
+        # immutable (SHA-like) tags via `allow-tags` above. image-updater will
+        # choose the newest tag that matches the SHA regex and write that
+        # immutable tag back into the Helm chart's values.yaml (git write-back).
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/hemanthreddy739/my-apps-argo-type.git
+        targetRevision: main
+        path: '{{path}}'                # points to that folder (Helm chart)
+        helm:
+          valueFiles:
+            - values.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'   # target namespace = folder name
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
