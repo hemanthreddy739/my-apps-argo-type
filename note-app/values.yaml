@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: "hemanthreddy739/note-app"
+  repository: "hemanthreddy739.azurecr.io/note-app"
   pullPolicy: IfNotPresent
   # override image.tag separately if needed
   tag: ""
