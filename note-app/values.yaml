@@ -7,7 +7,7 @@ image:
   repository: "hemanthreddy739.azurecr.io/note-app"
   pullPolicy: IfNotPresent
   # override image.tag separately if needed
-  tag: "203bb036e124f4995591b2d5779a4e35732864d5"
+  tag: "sha-7348f65"
 service:
   type: ClusterIP
   port: 80
