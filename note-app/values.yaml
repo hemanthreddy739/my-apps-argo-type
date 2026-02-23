@@ -3,17 +3,14 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 2
-
 image:
   repository: "hemanthreddy739.azurecr.io/note-app"
   pullPolicy: IfNotPresent
   # override image.tag separately if needed
-  tag: "sha-d283ea2"
-
+  tag: "203bb036e124f4995591b2d5779a4e35732864d5"
 service:
   type: ClusterIP
   port: 80
-
 resources: {}
 #  limits:
 #    cpu: 100m
@@ -23,7 +20,5 @@ resources: {}
 #    memory: 128Mi
 
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
